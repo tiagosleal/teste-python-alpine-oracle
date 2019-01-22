@@ -1,0 +1,38 @@
+version: '3'
+services:
+  python-flask-teste:
+    image: python-flask-tiago-dev:v2
+    volumes:
+#      - /root/python-flask-jwt:/usr/src/app
+      - "./:/usr/src/app"
+    ports:
+      - "8080:5000"
+    depends_on:
+      - openldap-teste
+      - redis-teste
+    links:
+      - openldap-teste
+      - redis-teste
+
+  openldap-teste:
+    image: osixia/openldap:1.2.2
+    ports:
+      - "389:389"
+      - "636:636"
+    volumes:
+#      - "/root/python-flask-jwt/var/lib/ldap:/var/lib/ldap"
+      - "./var/lib/ldap:/var/lib/ldap"
+#      - "/root/python-flask-jwt/etc/ldap/slapd.d:/etc/ldap/slapd.d"
+      - "./etc/ldap/slapd.d:/etc/ldap/slapd.d"
+    environment:
+      - LDAP_ORGANISATION:'Tiago'
+      - LDAP_DOMAIN='tiago.local'
+      - LDAP_ADMIN_PASSWORD='master'
+
+  redis-teste:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./redis:/data"
+    entrypoint: redis-server --appendonly yes      
